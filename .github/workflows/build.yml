@@ -1,7 +1,6 @@
 name: Build FreeCrates
 
-on:
-  workflow_dispatch:
+on: [workflow_dispatch]
 
 jobs:
   build:
@@ -11,26 +10,28 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Java
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '25'
 
-      - name: Extract project
+      - name: Extract source ZIP
         run: |
-          mkdir project
-          unzip -q FreeCrates-1.0.0-Paper26.2-source.zip -d project
+          unzip -q FreeCrates-1.0.0-Paper26.2-source.zip
+          mv FreeCrates-1.0.0-Paper26.2 project
 
-      - name: Set up Gradle
+      - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.1'
 
-      - name: Build plugin
+      - name: Build
         working-directory: project
         run: gradle clean build
 
-      - name: Upload JAR
+      - name: Upload FreeCrates JAR
         uses: actions/upload-artifact@v4
         with:
-          name: FreeCrates
+          name: FreeCrates-JAR
           path: project/build/libs/*.jar
